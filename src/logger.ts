@@ -23,6 +23,8 @@ export interface EvictionLogEvent {
   identificationFailed: boolean;
   /** Number of sources currently rejected in the session. */
   activeRejectedCount: number;
+  /** Optional error code when eviction or rejection fails. */
+  errorCode?: string;
   /** Optional extra diagnostic metadata (automatically scrubbed by privacy guard). */
   details?: Record<string, unknown>;
 }
@@ -37,6 +39,17 @@ export interface Logger {
   logEvictionEvent(event: EvictionLogEvent): void;
   /** Alias for logEvictionEvent. */
   logEviction(event: EvictionLogEvent): void;
+  /** Alias for logEvictionEvent used during tool rejection attempts. */
+  logRejection(event: EvictionLogEvent): void;
+  /** Record a source restoration event when debug is enabled. */
+  logRestore(event: {
+    sessionID?: string;
+    sourceId: string;
+    restored: boolean;
+    activeRejectedCount?: number;
+  }): void;
+  /** Record a session eviction reset event when debug is enabled. */
+  logReset(event: { sessionID?: string; clearedCount: number }): void;
   /** Record a general debug log message with privacy-scrubbed metadata. */
   debug(event: string, details?: Record<string, unknown>): void;
   /** Record a warning message with privacy-scrubbed metadata. */
@@ -176,7 +189,10 @@ export function createLogger(
             : 0,
       };
 
-      const scrubbedDetails = sanitizeMetadata(event.details);
+      const mergedDetails = event.errorCode
+        ? { ...(event.details ?? {}), errorCode: event.errorCode }
+        : event.details;
+      const scrubbedDetails = sanitizeMetadata(mergedDetails);
       if (scrubbedDetails) {
         entry.details = scrubbedDetails;
       }
@@ -186,6 +202,31 @@ export function createLogger(
 
     logEviction(event: EvictionLogEvent): void {
       this.logEvictionEvent(event);
+    },
+
+    logRejection(event: EvictionLogEvent): void {
+      this.logEvictionEvent(event);
+    },
+
+    logRestore(event: {
+      sessionID?: string;
+      sourceId: string;
+      restored: boolean;
+      activeRejectedCount?: number;
+    }): void {
+      this.debug("context_restore", {
+        sessionID: event.sessionID,
+        sourceId: event.sourceId,
+        restored: event.restored,
+        activeRejectedCount: event.activeRejectedCount,
+      });
+    },
+
+    logReset(event: { sessionID?: string; clearedCount: number }): void {
+      this.debug("context_reset", {
+        sessionID: event.sessionID,
+        clearedCount: event.clearedCount,
+      });
     },
 
     debug(event: string, details?: Record<string, unknown>): void {

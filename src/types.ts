@@ -229,6 +229,7 @@ export interface ToolDefinition {
   name?: string;
   description: string;
   parameters?: Record<string, unknown>;
+  inputSchema?: Record<string, unknown>;
   args?: Record<string, unknown>;
   execute: (
     args: Record<string, unknown>,
@@ -247,6 +248,8 @@ export interface CommandDefinition {
 
 export interface PluginContext {
   cwd?: string;
+  directory?: string;
+  worktree?: string;
   configDir?: string;
   options?: Record<string, unknown>;
   config?: Record<string, unknown>;
@@ -264,6 +267,11 @@ export interface PluginContext {
           nameOrDef: string | ToolDefinition,
           def?: ToolDefinition
         ) => void;
+        transform?: (
+          handler: (
+            tools: Record<string, ToolDefinition>
+          ) => Promise<Record<string, ToolDefinition> | void> | Record<string, ToolDefinition> | void
+        ) => void;
         hook?: (
           event: "execute.before" | "execute.after" | string,
           handler: (payload: any) => Promise<void> | void
@@ -280,6 +288,13 @@ export interface PluginContext {
         [key: string]: unknown;
       }
     | ((nameOrDef: string | CommandDefinition, def?: CommandDefinition) => void);
+  commands?: {
+    register?: (
+      nameOrDef: string | CommandDefinition,
+      def?: CommandDefinition
+    ) => void;
+    [key: string]: unknown;
+  };
   [key: string]: unknown;
 }
 
