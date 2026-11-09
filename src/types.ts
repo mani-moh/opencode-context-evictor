@@ -41,7 +41,9 @@ export interface RejectionRecord {
   target: string;
   reason: string;
   rejectedAt: number;
+  evictionCount: number;
   evictedCount: number;
+  lastCharsSaved: number;
   lastCharsRemoved: number;
 }
 
@@ -78,6 +80,7 @@ export interface SessionEvictionStatus {
   activeCount: number;
   rejectedSources: RejectionRecord[];
   knownSources: SourceID[];
+  totalCharsSavedLastPass: number;
   totalCharsRemoved: number;
 }
 
