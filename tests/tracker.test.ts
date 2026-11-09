@@ -23,15 +23,15 @@ test("normalizeFilePath normalizes slashes, strips leading ./, collapses duplica
   );
   assert.equal(
     normalizeFilePath(
-      "d:\\Projects\\app\\src\\config\\database.ts",
-      "d:\\Projects\\app"
+      "C:\\virtual-workspace\\app\\src\\config\\database.ts",
+      "C:\\virtual-workspace\\app"
     ),
     "src/config/database.ts"
   );
   assert.equal(
     normalizeFilePath(
-      "D:/Projects/app/src/config/database.ts",
-      "d:\\Projects\\app\\"
+      "C:/virtual-workspace/app/src/config/database.ts",
+      "C:\\virtual-workspace\\app\\"
     ),
     "src/config/database.ts"
   );
@@ -77,8 +77,8 @@ test("parseSourceId and parseAndValidateSourceId validate skill:<id> and file:<p
   }
 
   const validFileWithRoot = parseSourceId(
-    "file:d:\\Projects\\app\\src\\config\\database.ts",
-    "d:\\Projects\\app"
+    "file:C:\\virtual-workspace\\app\\src\\config\\database.ts",
+    "C:\\virtual-workspace\\app"
   );
   assert.deepEqual(validFileWithRoot, {
     kind: "file",

@@ -32,7 +32,7 @@ test("createPluginTools: context_evict rejects loaded skill and file, handles er
   const logEntries: LogEntry[] = [];
   const config = { enabled: true, debug: true, preserveMarkers: true };
   const logger = createLogger(config, logEntries);
-  const workspaceRoot = "D:/Projects/demo-app";
+  const workspaceRoot = "C:/virtual-workspace/demo-app";
   const registry = createRejectionRegistry({ workspaceRoot, logger });
 
   const sessionID = "ses-tools-1";
@@ -48,7 +48,7 @@ test("createPluginTools: context_evict rejects loaded skill and file, handles er
     sessionID,
     "call-read-1",
     "read",
-    { filePath: "D:\\Projects\\demo-app\\src\\config\\database.ts" },
+    { filePath: "C:\\virtual-workspace\\demo-app\\src\\config\\database.ts" },
     workspaceRoot
   );
 
@@ -365,7 +365,7 @@ test("OpenCode V2 lifecycle (setup): tool hooks, Turn-1 system prompt, zero-clon
   const persistedStorage = new Map<string, unknown>();
 
   const ctx: PluginContext = {
-    cwd: "D:/Projects/v2-workspace",
+    cwd: "C:/virtual-workspace/v2-workspace",
     options: { enabled: true, debug: true, preserveMarkers: true },
     storage: {
       get: (key) => persistedStorage.get(key) as any,
@@ -433,7 +433,7 @@ test("OpenCode V2 lifecycle (setup): tool hooks, Turn-1 system prompt, zero-clon
     sessionID,
     tool: "read",
     callID: "call-read-db",
-    args: { filePath: "D:/Projects/v2-workspace/src/config/database.ts" },
+    args: { filePath: "C:/virtual-workspace/v2-workspace/src/config/database.ts" },
   });
 
   const msg0: V2Message = {
@@ -569,7 +569,7 @@ test("OpenCode V2 lifecycle (setup): tool hooks, Turn-1 system prompt, zero-clon
 
 test("OpenCode V1 lifecycle (server): tool hooks, system transform, messages transform, compacting, and command hook", async () => {
   const hooks: V1Hooks = await server({
-    directory: "D:/Projects/v1-workspace",
+    directory: "C:/virtual-workspace/v1-workspace",
     options: { enabled: true, debug: false, preserveMarkers: true },
   });
 
@@ -595,7 +595,7 @@ test("OpenCode V1 lifecycle (server): tool hooks, system transform, messages tra
   assert.equal(sysOut.system.length, 2);
 
   // 2. Record tool execution via V1 tool.execute.before
-  const argsObj = { filePath: "D:/Projects/v1-workspace/src/legacy.ts" };
+  const argsObj = { filePath: "C:/virtual-workspace/v1-workspace/src/legacy.ts" };
   await hooks["tool.execute.before"]!(
     {
       tool: "read",

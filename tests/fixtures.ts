@@ -12,7 +12,7 @@ import {
   type V2Message,
 } from "../src/index.js";
 
-export const WORKSPACE_ROOT = "D:/Projects/mongo-order-service";
+export const WORKSPACE_ROOT = "C:/virtual-workspace/mongo-order-service";
 
 export const POSTGRES_SKILL_ID = "skill:database-optimization" as const;
 export const MONGODB_SKILL_ID = "skill:mongodb-indexing" as const;

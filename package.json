@@ -19,7 +19,8 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "npm run build && node --test dist/tests/*.test.js"
+    "test": "npm run build && node --test dist/tests/*.test.js",
+    "benchmark": "npm run build && node dist/tests/large-scale.benchmark.js"
   },
   "peerDependencies": {
     "@opencode/plugin": ">=2.0.0",
