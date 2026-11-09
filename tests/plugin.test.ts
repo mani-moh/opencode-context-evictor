@@ -338,7 +338,9 @@ test("executeSlashCommand: supports status, restore, reset, evict, and help outp
     workspaceRoot,
   });
   assert.ok(
-    helpOut.includes("Usage: /context-evictor [status | restore <source_id> | reset]")
+    helpOut.includes(
+      "Usage: /context-evictor [status | restore <source_id> | reset | evict <source_id> [reason]]"
+    )
   );
 
   // Verify CommandDefinition wrapper works with array and object arguments

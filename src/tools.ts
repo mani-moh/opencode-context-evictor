@@ -532,7 +532,7 @@ export async function executeSlashCommand(
     return `Evicted "${result.record.sourceId}" from subsequent model requests in session "${sessionID}". Reason: ${result.record.reason}`;
   }
 
-  return "Usage: /context-evictor [status | restore <source_id> | reset]";
+  return "Usage: /context-evictor [status | restore <source_id> | reset | evict <source_id> [reason]]";
 }
 
 /**
@@ -544,7 +544,7 @@ export function createSlashCommandDefinition(
   return {
     name: "context-evictor",
     description:
-      "Inspect, restore, or reset evicted context sources in the current session (/context-evictor [status | restore <source_id> | reset]).",
+      "Inspect, restore, or reset evicted context sources in the current session (/context-evictor [status | restore <source_id> | reset | evict <source_id> [reason]]).",
     async execute(
       args: string | string[] | Record<string, unknown>,
       context?: ToolExecutionContext
