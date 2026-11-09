@@ -1,0 +1,51 @@
+{
+  "name": "opencode-context-evictor",
+  "version": "1.0.0",
+  "description": "Semantic rejection-triggered context eviction with prefix-cache preservation for OpenCode",
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "dist/src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test dist/tests/*.test.js"
+  },
+  "peerDependencies": {
+    "@opencode/plugin": ">=2.0.0",
+    "@opencode-ai/plugin": ">=1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@opencode/plugin": {
+      "optional": true
+    },
+    "@opencode-ai/plugin": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "context-evictor",
+    "context-management",
+    "prefix-cache"
+  ],
+  "license": "MIT"
+}
