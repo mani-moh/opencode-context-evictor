@@ -43,6 +43,9 @@ export interface Logger {
   getEntries(): LogEntry[];
 }
 
+export type PrivacySafeLogger = Logger;
+
+
 /**
  * Keys that may hold raw file/skill/tool content and must NEVER be logged.
  */
@@ -62,13 +65,27 @@ const FORBIDDEN_CONTENT_KEYS = new Set([
   "transcript",
 ]);
 
+function sanitizeValue(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeValue(item));
+  }
+  if (value && typeof value === "object") {
+    return sanitizeMetadata(value as Record<string, unknown>);
+  }
+  if (typeof value === "string" && value.length > 256) {
+    // Truncate overly long arbitrary strings as an extra defense-in-depth guard
+    return `${value.slice(0, 256)}...[truncated]`;
+  }
+  return value;
+}
+
 /**
  * Recursively scrubs any fields that might contain raw skill/file/message content.
  */
 export function sanitizeMetadata(
   input: Record<string, unknown> | undefined
 ): Record<string, unknown> | undefined {
-  if (!input || typeof input !== "object") {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
     return undefined;
   }
 
@@ -77,18 +94,12 @@ export function sanitizeMetadata(
     if (FORBIDDEN_CONTENT_KEYS.has(key.toLowerCase())) {
       continue;
     }
-    if (value && typeof value === "object" && !Array.isArray(value)) {
-      sanitized[key] = sanitizeMetadata(value as Record<string, unknown>);
-    } else if (typeof value === "string" && value.length > 256) {
-      // Truncate overly long arbitrary strings as an extra defense-in-depth guard
-      sanitized[key] = `${value.slice(0, 256)}...[truncated]`;
-    } else {
-      sanitized[key] = value;
-    }
+    sanitized[key] = sanitizeValue(value);
   }
 
   return Object.keys(sanitized).length > 0 ? sanitized : undefined;
 }
+
 
 /**
  * Creates a privacy-safe logger configured for the Context Evictor plugin.
@@ -223,3 +234,6 @@ export function createLogger(
     },
   };
 }
+
+export const createPrivacySafeLogger = createLogger;
+

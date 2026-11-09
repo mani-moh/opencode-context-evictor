@@ -7,9 +7,17 @@ import {
   DEFAULT_CONFIG,
   validateConfig,
   loadConfig,
+  resolveConfig,
   stripJsoncComments,
 } from "../src/config.js";
-import { createLogger, type LogEntry } from "../src/logger.js";
+import {
+  createLogger,
+  createPrivacySafeLogger,
+  sanitizeMetadata,
+  type LogEntry,
+  type PrivacySafeLogger,
+} from "../src/logger.js";
+
 
 test("DEFAULT_CONFIG has expected spec default values", () => {
   assert.deepEqual(DEFAULT_CONFIG, {
@@ -272,6 +280,28 @@ test("createLogger enforces strict privacy guard and never logs raw rejected con
     assert.ok(!fileContents.includes(secretSkillContent));
     assert.ok(!fileContents.includes(secretFileContent));
     assert.ok(fileContents.includes("skill:secret-skill"));
+
+    // Verify array recursion in sanitizeMetadata and alias exports
+    assert.equal(resolveConfig, loadConfig);
+    assert.equal(createPrivacySafeLogger, createLogger);
+    const typedLogger: PrivacySafeLogger = createPrivacySafeLogger({
+      enabled: true,
+      debug: false,
+      preserveMarkers: true,
+    });
+    assert.equal(typedLogger.isDebugEnabled, false);
+
+    const scrubbedNested = sanitizeMetadata({
+      items: [
+        { id: "item-1", content: secretSkillContent, text: secretFileContent },
+        { id: "item-2", nested: [{ output: secretSkillContent, safe: "ok" }] },
+      ],
+    });
+    const serializedNested = JSON.stringify(scrubbedNested);
+    assert.ok(!serializedNested.includes(secretSkillContent));
+    assert.ok(!serializedNested.includes(secretFileContent));
+    assert.ok(serializedNested.includes("item-1"));
+    assert.ok(serializedNested.includes("ok"));
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

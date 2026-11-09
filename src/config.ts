@@ -309,3 +309,9 @@ export function loadConfig(
 
   return validateConfig(mergedRaw).config;
 }
+
+/**
+ * Alias for `loadConfig` for convenience across modules.
+ */
+export const resolveConfig = loadConfig;
+
