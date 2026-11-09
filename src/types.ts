@@ -65,6 +65,9 @@ export interface TrackedSourceOccurrence {
  * Per-pass eviction statistics returned by the eviction engine.
  */
 export interface EvictionStats {
+  evictedSources: SourceID[];
+  messagesModified: number;
+  partsRedacted: number;
   messagesInspected: number;
   messagesCloned: number;
   occurrencesEvicted: number;

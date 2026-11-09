@@ -19,6 +19,16 @@ const VALID_SKILL_ID_PATTERN = /^[A-Za-z0-9_./:@+-]+$/;
  * can be recognized structurally without re-evicting.
  */
 export const TOMBSTONE_PREFIX = "[Context Evicted:";
+export const MINIMAL_TOMBSTONE = "[Context Evicted]";
+
+export function isTombstoneText(text: string): boolean {
+  const trimmed = text.trim();
+  return (
+    text.startsWith(TOMBSTONE_PREFIX) ||
+    trimmed.startsWith(TOMBSTONE_PREFIX) ||
+    trimmed === MINIMAL_TOMBSTONE
+  );
+}
 
 /**
  * Regex matching structured `<skill_content name="...">...</skill_content>` or
@@ -306,34 +316,34 @@ function getPartTextLength(part: V2Part | V1Part): {
     const out = part.state.output;
     return {
       length: out.length,
-      alreadyEvicted: out.startsWith(TOMBSTONE_PREFIX),
+      alreadyEvicted: isTombstoneText(out),
     };
   }
   if (typeof (part as V2Part).output === "string") {
     const out = (part as V2Part).output as string;
     return {
       length: out.length,
-      alreadyEvicted: out.startsWith(TOMBSTONE_PREFIX),
+      alreadyEvicted: isTombstoneText(out),
     };
   }
   if (typeof (part as V2Part).result === "string") {
     const res = (part as V2Part).result as string;
     return {
       length: res.length,
-      alreadyEvicted: res.startsWith(TOMBSTONE_PREFIX),
+      alreadyEvicted: isTombstoneText(res),
     };
   }
   if (typeof part.text === "string") {
     return {
       length: part.text.length,
-      alreadyEvicted: part.text.startsWith(TOMBSTONE_PREFIX),
+      alreadyEvicted: isTombstoneText(part.text),
     };
   }
   const content = (part as V2Part).content;
   if (typeof content === "string") {
     return {
       length: content.length,
-      alreadyEvicted: content.startsWith(TOMBSTONE_PREFIX),
+      alreadyEvicted: isTombstoneText(content),
     };
   }
   if (Array.isArray(content)) {
@@ -342,7 +352,7 @@ function getPartTextLength(part: V2Part | V1Part): {
     for (const sub of content) {
       if (sub && typeof sub.text === "string") {
         total += sub.text.length;
-        if (!sub.text.startsWith(TOMBSTONE_PREFIX)) {
+        if (!isTombstoneText(sub.text)) {
           allEvicted = false;
         }
       }
@@ -359,7 +369,7 @@ function getMessageTextLength(msg: V2Message): {
   if (typeof msg.content === "string") {
     return {
       length: msg.content.length,
-      alreadyEvicted: msg.content.startsWith(TOMBSTONE_PREFIX),
+      alreadyEvicted: isTombstoneText(msg.content),
     };
   }
   const parts = Array.isArray(msg.parts)
@@ -410,11 +420,10 @@ function extractSkillEnvelopeMatches(
     }
     const parsed = parseSourceId(`skill:${rawSkillName}`, workspaceRoot);
     if (parsed) {
-      const trimmedInner = innerBody.trim();
       results.push({
         parsed,
         innerLength: innerBody.length,
-        alreadyEvicted: trimmedInner.startsWith(TOMBSTONE_PREFIX),
+        alreadyEvicted: isTombstoneText(innerBody),
       });
     }
   }

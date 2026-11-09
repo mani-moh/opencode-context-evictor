@@ -35,6 +35,8 @@ export interface Logger {
   readonly isDebugEnabled: boolean;
   /** Record a structured Section 13 eviction telemetry event when debug is enabled. */
   logEvictionEvent(event: EvictionLogEvent): void;
+  /** Alias for logEvictionEvent. */
+  logEviction(event: EvictionLogEvent): void;
   /** Record a general debug log message with privacy-scrubbed metadata. */
   debug(event: string, details?: Record<string, unknown>): void;
   /** Record a warning message with privacy-scrubbed metadata. */
@@ -180,6 +182,10 @@ export function createLogger(
       }
 
       writeEntry(entry);
+    },
+
+    logEviction(event: EvictionLogEvent): void {
+      this.logEvictionEvent(event);
     },
 
     debug(event: string, details?: Record<string, unknown>): void {
